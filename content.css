@@ -1,0 +1,97 @@
+/* Page Tinker UI. Everything is scoped under .pt-* and forced with
+   !important so host-page styles can't break the toolbar/overlay. */
+
+.pt-overlay {
+  position: fixed !important;
+  z-index: 2147483646 !important;
+  pointer-events: none !important;
+  background: rgba(64, 132, 247, 0.18) !important;
+  border: 2px solid rgba(64, 132, 247, 0.9) !important;
+  border-radius: 2px !important;
+  box-sizing: border-box !important;
+  display: none;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.pt-toolbar {
+  position: fixed !important;
+  z-index: 2147483647 !important;
+  top: 12px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 6px 8px !important;
+  background: #1f2430 !important;
+  border: 1px solid #3a4151 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35) !important;
+  font: 13px/1.2 system-ui, -apple-system, Segoe UI, Roboto, sans-serif !important;
+  color: #e6e9ef !important;
+}
+
+.pt-title {
+  font-weight: 600 !important;
+  padding: 0 8px 0 4px !important;
+  color: #9aa4b8 !important;
+  letter-spacing: 0.2px !important;
+}
+
+.pt-btn {
+  appearance: none !important;
+  border: 1px solid #3a4151 !important;
+  background: #2a303d !important;
+  color: #e6e9ef !important;
+  padding: 6px 10px !important;
+  border-radius: 7px !important;
+  cursor: pointer !important;
+  font: inherit !important;
+  line-height: 1 !important;
+  transition: background 0.12s ease, border-color 0.12s ease !important;
+}
+
+.pt-btn:hover {
+  background: #343b4a !important;
+}
+
+.pt-btn.pt-active {
+  background: #4084f7 !important;
+  border-color: #4084f7 !important;
+  color: #fff !important;
+}
+
+.pt-done {
+  margin-left: 6px !important;
+  background: transparent !important;
+  border-color: #51596b !important;
+  color: #9aa4b8 !important;
+}
+
+.pt-done:hover {
+  color: #fff !important;
+  border-color: #9aa4b8 !important;
+}
+
+.pt-btn:disabled {
+  opacity: 0.4 !important;
+  cursor: default !important;
+}
+
+.pt-btn:disabled:hover {
+  background: #2a303d !important;
+}
+
+.pt-sep {
+  width: 1px !important;
+  align-self: stretch !important;
+  background: #3a4151 !important;
+  margin: 0 2px !important;
+}
+
+.pt-editing {
+  outline: 2px dashed #f7b500 !important;
+  outline-offset: 1px !important;
+  cursor: text !important;
+}
