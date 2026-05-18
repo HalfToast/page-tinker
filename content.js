@@ -32,7 +32,7 @@
     findInput: null, // the Find text box, so setMode can refresh highlights
     toolbarPos: null, // {left, top} once the user has dragged it this session
     editingEl: null, // element currently in contentEditable mode
-    editingBefore: null, // innerHTML snapshot captured when editing began
+    editingBefore: null, // cloned child-node snapshot taken when editing began
     editHandlers: null, // listeners bound to the element being edited
     undo: [], // stack of applied actions (most recent last)
     redo: [] // stack of undone actions
@@ -83,6 +83,26 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
 
+  // Snapshot / restore an element's contents via cloned DOM nodes instead of
+  // innerHTML strings. This avoids re-parsing HTML (and the AMO "unsafe
+  // assignment to innerHTML" warning) - we only ever move the page's own,
+  // already-parsed nodes around.
+  function cloneChildren(el) {
+    return Array.from(el.childNodes, (n) => n.cloneNode(true));
+  }
+
+  function setChildren(el, nodes) {
+    el.replaceChildren(...nodes.map((n) => n.cloneNode(true)));
+  }
+
+  function sameContent(el, nodes) {
+    if (el.childNodes.length !== nodes.length) return false;
+    for (let i = 0; i < nodes.length; i++) {
+      if (!el.childNodes[i].isEqualNode(nodes[i])) return false;
+    }
+    return true;
+  }
+
   // ---- undo / redo -----------------------------------------------------
 
   function record(action) {
@@ -94,7 +114,7 @@
   function applyInverse(a) {
     try {
       if (a.type === "edit") {
-        a.el.innerHTML = a.before;
+        setChildren(a.el, a.before);
       } else if (a.type === "hide") {
         if (a.prevValue) {
           a.el.style.setProperty("visibility", a.prevValue, a.prevPriority);
@@ -114,7 +134,7 @@
   function applyForward(a) {
     try {
       if (a.type === "edit") {
-        a.el.innerHTML = a.after;
+        setChildren(a.el, a.after);
       } else if (a.type === "hide") {
         a.el.style.setProperty("visibility", "hidden", "important");
       } else if (a.type === "delete") {
@@ -175,15 +195,15 @@
     el.classList.remove(`${NS}-editing`);
     state.editingEl = null;
     state.editingBefore = null;
-    if (before != null && el.innerHTML !== before) {
-      record({ type: "edit", el, before, after: el.innerHTML });
+    if (before && !sameContent(el, before)) {
+      record({ type: "edit", el, before, after: cloneChildren(el) });
     }
   }
 
   function startTextEdit(el) {
     endTextEdit();
     state.editingEl = el;
-    state.editingBefore = el.innerHTML;
+    state.editingBefore = cloneChildren(el);
     el.setAttribute("contenteditable", "true");
     el.classList.add(`${NS}-editing`);
     el.focus();
@@ -476,6 +496,8 @@
     bar.style.setProperty("transform", "none", "important");
   }
 
+  // Pointer Events so the bar can be dragged with a mouse, a finger (Firefox
+  // for Android), or a pen - one code path for all of them.
   function makeDraggable(bar, handle) {
     let sx = 0, sy = 0, ox = 0, oy = 0;
 
@@ -492,13 +514,14 @@
     };
 
     const onUp = (e) => {
-      document.removeEventListener("mousemove", onMove, true);
-      document.removeEventListener("mouseup", onUp, true);
+      document.removeEventListener("pointermove", onMove, true);
+      document.removeEventListener("pointerup", onUp, true);
+      document.removeEventListener("pointercancel", onUp, true);
       e.stopPropagation();
     };
 
-    handle.addEventListener("mousedown", (e) => {
-      if (e.button !== 0) return;
+    handle.addEventListener("pointerdown", (e) => {
+      if (e.button > 0) return; // ignore right/middle mouse; touch/pen are 0
       const r = bar.getBoundingClientRect();
       setPos(bar, r.left, r.top); // pin before the CSS centering fights us
       sx = e.clientX;
@@ -507,8 +530,9 @@
       oy = r.top;
       e.preventDefault();
       e.stopPropagation();
-      document.addEventListener("mousemove", onMove, true);
-      document.addEventListener("mouseup", onUp, true);
+      document.addEventListener("pointermove", onMove, true);
+      document.addEventListener("pointerup", onUp, true);
+      document.addEventListener("pointercancel", onUp, true);
     }, true);
   }
 

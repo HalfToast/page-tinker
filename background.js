@@ -33,9 +33,15 @@ async function toggleOnTab(tab) {
   }
 }
 
+// The context-menu API is desktop-only on Firefox - chrome.contextMenus is
+// undefined on Firefox for Android. Feature-detect so the background script
+// doesn't throw there; the toolbar button (extensions menu) still works.
+const hasMenus = typeof chrome.contextMenus !== "undefined";
+
 // Recreate the menu item idempotently. removeAll first so an event-page /
 // service-worker restart can't throw "duplicate id".
 function ensureMenu() {
+  if (!hasMenus) return;
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({
       id: MENU_ID,
@@ -52,9 +58,11 @@ chrome.action.onClicked.addListener((tab) => {
   toggleOnTab(tab);
 });
 
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === MENU_ID) toggleOnTab(tab);
-});
+if (hasMenus) {
+  chrome.contextMenus.onClicked.addListener((info, tab) => {
+    if (info.menuItemId === MENU_ID) toggleOnTab(tab);
+  });
+}
 
 chrome.commands.onCommand.addListener(async (command) => {
   if (command !== "toggle-tinker") return;

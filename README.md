@@ -1,6 +1,6 @@
 # Page Tinker
 
-A Firefox extension that lets you click any element on a page to edit its text, hide it, or delete it - no DevTools, no hunting through the HTML inspector. All changes are ephemeral: reload the page and everything is back to normal. Chrome/Edge compatible from the same manifest.
+A Firefox extension (desktop **and Firefox for Android**) that lets you click any element on a page to edit its text, hide it, or delete it - no DevTools, no hunting through the HTML inspector. All changes are ephemeral: reload the page and everything is back to normal.
 
 ## Features
 
@@ -24,7 +24,9 @@ A Firefox extension that lets you click any element on a page to edit its text, 
 
 Start a session on a page by clicking the **Page Tinker toolbar button** (in the browser's extensions area), right-clicking the page → **Start Page Tinker on this page**, or pressing `Alt+Shift+E`. The floating toolbar then controls it.
 
-Chrome/Edge: open `chrome://extensions`, enable Developer mode, and **Load unpacked** on this folder. The single manifest declares both `background.scripts` (Firefox) and `service_worker` (Chrome). Chrome ignores SVG icons, so generate PNGs before a Chrome Web Store submission.
+**Firefox for Android:** install the signed add-on from AMO (or load it via a debug build). Start a session from the **⋮ menu → Extensions → Page Tinker** (the right-click menu and `Alt+Shift+E` are desktop-only). The toolbar is touch-draggable; element edit/hide/delete/replace work by tapping. Screenshot capture may be unavailable on Android and fails gracefully if so.
+
+Chrome/Edge: the manifest uses `background.scripts` (Firefox event page) and intentionally omits `background.service_worker` so the Firefox/AMO build validates cleanly. Chrome ignores `scripts` and SVG icons, so for a Chrome Web Store build add a `background.service_worker` entry and PNG icons first.
 
 ## Files
 

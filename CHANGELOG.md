@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.0
+
+- **Firefox for Android support.** Works on Android: the toolbar drag uses Pointer Events (mouse/touch/pen), the desktop-only `contextMenus` API is feature-detected so the background script doesn't break there, and the manifest declares `gecko_android` compatibility. Activate from the extensions menu (right-click and `Alt+Shift+E` are desktop-only; screenshot capture may be unavailable on Android and fails gracefully).
+- **Fix:** edit undo/redo now snapshots and restores cloned DOM nodes instead of assigning `innerHTML`, clearing the AMO validator's "unsafe assignment to innerHTML" warnings. The `background.service_worker` key was also removed (Firefox ignores it) so the validator runs clean.
+
 ## 0.3.0
 
 - **Draggable toolbar.** Drag the bar by its title to reposition it (clamped to the viewport) so it doesn't cover the element you want to edit. Its position is remembered for the rest of the page session, including across toggling the editor off and on.
@@ -13,7 +18,7 @@
 
 - **Three activation gestures.** Start a session from the toolbar button (shown in the browser's extensions area), a right-click menu item (“Start Page Tinker on this page”), or the `Alt+Shift+E` shortcut - all of which grant `activeTab`. Adds the benign `contextMenus` permission (one menu entry, no page access); still no host permissions, storage, network, or telemetry.
 - **Undo / redo** with a full per-session history stack. Floating-toolbar buttons plus `Ctrl+Z` / `Ctrl+Shift+Z` (and `Ctrl+Y`). Edit, hide, delete, and replace all reverse cleanly; deletes are fully reversible - removed nodes are reinserted at their original position via stored parent and next-sibling. Native text-field undo is left alone while you're typing. History survives toggling the editor off and on within the same page session.
-- **Firefox-first packaging.** `browser_specific_settings.gecko` with an add-on id, `strict_min_version` 142.0, and `data_collection_permissions: none`. Background declared as `background.scripts` (Firefox event page) while still exposing `service_worker` for Chrome/Edge from a single manifest.
+- **Firefox-first packaging.** `browser_specific_settings.gecko` with an add-on id, `strict_min_version` 142.0, and `data_collection_permissions: none`. Background declared as `background.scripts` (Firefox event page); no `service_worker` key, so the AMO validator stays warning-free.
 - **SVG logo** used directly as the toolbar/add-on icon. Firefox renders SVG icons natively, so no rasterization is needed for Firefox builds.
 
 ## 0.1.0

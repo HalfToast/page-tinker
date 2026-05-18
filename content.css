@@ -41,6 +41,7 @@
   color: #9aa4b8 !important;
   letter-spacing: 0.2px !important;
   cursor: move !important;
+  touch-action: none !important;
 }
 
 .pt-btn {
