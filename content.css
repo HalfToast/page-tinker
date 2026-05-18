@@ -21,8 +21,10 @@
   left: 50% !important;
   transform: translateX(-50%) !important;
   display: flex !important;
+  flex-wrap: wrap !important;
   align-items: center !important;
   gap: 6px !important;
+  max-width: 92vw !important;
   padding: 6px 8px !important;
   background: #1f2430 !important;
   border: 1px solid #3a4151 !important;
@@ -30,6 +32,7 @@
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35) !important;
   font: 13px/1.2 system-ui, -apple-system, Segoe UI, Roboto, sans-serif !important;
   color: #e6e9ef !important;
+  user-select: none !important;
 }
 
 .pt-title {
@@ -37,6 +40,7 @@
   padding: 0 8px 0 4px !important;
   color: #9aa4b8 !important;
   letter-spacing: 0.2px !important;
+  cursor: move !important;
 }
 
 .pt-btn {
@@ -62,18 +66,6 @@
   color: #fff !important;
 }
 
-.pt-done {
-  margin-left: 6px !important;
-  background: transparent !important;
-  border-color: #51596b !important;
-  color: #9aa4b8 !important;
-}
-
-.pt-done:hover {
-  color: #fff !important;
-  border-color: #9aa4b8 !important;
-}
-
 .pt-btn:disabled {
   opacity: 0.4 !important;
   cursor: default !important;
@@ -90,8 +82,63 @@
   margin: 0 2px !important;
 }
 
+.pt-done {
+  margin-left: 6px !important;
+  background: transparent !important;
+  border-color: #51596b !important;
+  color: #9aa4b8 !important;
+}
+
+.pt-done:hover {
+  color: #fff !important;
+  border-color: #9aa4b8 !important;
+}
+
+.pt-panel {
+  display: none;
+  flex: 1 1 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding-top: 6px !important;
+  margin-top: 2px !important;
+  border-top: 1px solid #3a4151 !important;
+}
+
+.pt-input {
+  appearance: none !important;
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  border: 1px solid #3a4151 !important;
+  background: #14181f !important;
+  color: #e6e9ef !important;
+  padding: 6px 8px !important;
+  border-radius: 7px !important;
+  font: inherit !important;
+}
+
+.pt-input:focus {
+  outline: none !important;
+  border-color: #4084f7 !important;
+}
+
+.pt-count {
+  color: #9aa4b8 !important;
+  font-size: 12px !important;
+  white-space: nowrap !important;
+}
+
 .pt-editing {
   outline: 2px dashed #f7b500 !important;
   outline-offset: 1px !important;
   cursor: text !important;
+}
+
+/* Live match highlight for Replace mode (CSS Custom Highlight API).
+   This pseudo is document-wide and matches HL_NAME ("pt-find") in JS. */
+::highlight(pt-find) {
+  background-color: #f7b500;
+  color: #1f2430;
 }

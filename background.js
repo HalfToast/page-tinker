@@ -1,15 +1,17 @@
-// Page Tinker - background service worker
+// Page Tinker - background
 //
-// We deliberately use NO host_permissions and NO declarative content scripts.
-// The editor is injected only when the user clicks the toolbar icon or presses
-// the shortcut, using the activeTab permission. That means the extension can
-// touch a page only on an explicit user gesture - the core privacy promise.
+// No host_permissions and no declarative content scripts. The editor is
+// injected only on a user gesture that grants activeTab: the toolbar button
+// (shown in the browser's extensions list/area), the right-click menu item,
+// or the Alt+Shift+E shortcut.
+
+const MENU_ID = "pt-start";
 
 async function toggleOnTab(tab) {
   if (!tab || !tab.id) return;
 
-  // Refuse to inject on pages where extensions are not allowed (chrome://,
-  // the Web Store, etc). executeScript would throw an unhelpful error.
+  // Browsers forbid extension injection on internal pages; executeScript
+  // would only throw an unhelpful error there.
   const url = tab.url || "";
   if (/^(chrome|edge|about|chrome-extension|https:\/\/chrome\.google\.com\/webstore)/.test(url)) {
     return;
@@ -20,7 +22,7 @@ async function toggleOnTab(tab) {
       target: { tabId: tab.id },
       files: ["content.css"]
     });
-    // Re-running content.js is safe: it guards against double-init and simply
+    // Re-running content.js is safe: it guards against double-init and just
     // toggles the editor on/off on each injection.
     await chrome.scripting.executeScript({
       target: { tabId: tab.id },
@@ -31,12 +33,47 @@ async function toggleOnTab(tab) {
   }
 }
 
+// Recreate the menu item idempotently. removeAll first so an event-page /
+// service-worker restart can't throw "duplicate id".
+function ensureMenu() {
+  chrome.contextMenus.removeAll(() => {
+    chrome.contextMenus.create({
+      id: MENU_ID,
+      title: "Start Page Tinker on this page",
+      contexts: ["all"]
+    });
+  });
+}
+
+chrome.runtime.onInstalled.addListener(ensureMenu);
+chrome.runtime.onStartup.addListener(ensureMenu);
+
 chrome.action.onClicked.addListener((tab) => {
   toggleOnTab(tab);
+});
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId === MENU_ID) toggleOnTab(tab);
 });
 
 chrome.commands.onCommand.addListener(async (command) => {
   if (command !== "toggle-tinker") return;
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   toggleOnTab(tab);
+});
+
+// Screenshot: the content script can't call captureVisibleTab itself, so it
+// asks here. activeTab (already granted by the start gesture) covers this -
+// no host permissions needed.
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (!msg || msg.cmd !== "capture") return;
+  const winId = sender.tab ? sender.tab.windowId : undefined;
+  chrome.tabs
+    .captureVisibleTab(winId, { format: "png" })
+    .then((url) => sendResponse(url))
+    .catch((err) => {
+      console.warn("Page Tinker: captureVisibleTab failed.", err);
+      sendResponse(null);
+    });
+  return true; // keep the channel open for the async response
 });

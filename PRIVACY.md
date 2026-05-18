@@ -17,9 +17,11 @@ navigate away.
 ## Page access
 
 Page Tinker has no host permissions. It can only touch a page after you
-explicitly invoke it (toolbar icon or the `Alt+Shift+E` shortcut), using the
+explicitly invoke it - via the toolbar button, the right-click menu item
+"Start Page Tinker on this page", or the `Alt+Shift+E` shortcut - using the
 `activeTab` permission, and only the tab you invoked it on. It never runs
-automatically or in the background.
+automatically or in the background. The `contextMenus` permission only adds
+that one menu entry and grants no access to page content.
 
 ## Contact
 

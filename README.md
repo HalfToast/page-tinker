@@ -4,14 +4,17 @@ A Firefox extension that lets you click any element on a page to edit its text, 
 
 ## Features
 
-- **Click to edit text** - click any element and type to replace its text; `Enter` or click away to commit.
+- **Click to edit text** - click any element and type to replace its text; `Enter` or click away to commit. Works on links and buttons without triggering them.
 - **Hide** - click an element to make it invisible while keeping its layout space.
 - **Delete** - click an element to remove it from the page entirely.
+- **Screenshot** - click an element to download a cropped PNG of it (visible-viewport area; the toolbar is kept out of the shot). No new permissions.
+- **Find & replace** - replace every occurrence of a string in the page's visible text at once; matches are highlighted live as you type. Counts as one undo step.
+- **Floating toolbar** - a small in-page bar to pick the mode (edit / hide / delete) and undo / redo, scoped and style-hardened so the host page's CSS can't break it. Drag it by its title to move it off whatever you want to edit.
 - **Undo / redo** - full per-session history. Toolbar buttons or `Ctrl+Z` / `Ctrl+Shift+Z` (and `Ctrl+Y`). Deletes are fully reversible; removed nodes return to their original position.
-- **No permissions, no data** - injected only on an explicit click via `activeTab`. No host permissions, no storage, no network, no telemetry. Nothing leaves your machine, nothing is even saved locally.
-- **Non-destructive UI** - a hover highlight overlay and a scoped, style-hardened toolbar the host page's CSS can't break.
-- Capture-phase clicks so links and buttons don't navigate while tinkering; `html`, `body`, and the toolbar itself are protected from deletion.
-- Toggle via the toolbar icon or `Alt+Shift+E`; `Esc` to exit.
+- **No permissions, no data** - injected only on an explicit gesture via `activeTab`. No host permissions, no storage, no network, no telemetry. Nothing leaves your machine, nothing is even saved locally. The only API permission besides `activeTab`/`scripting` is `contextMenus` (adds one right-click item; no page access).
+- **Non-destructive** - a hover highlight overlay that never mutates the page; typing can't trigger the host page's own keyboard shortcuts.
+- Capture-phase clicks so links and buttons don't navigate while tinkering; `html` and `body` are protected from deletion.
+- Start from the **toolbar button** (in the browser's extensions area), by **right-clicking** the page → **Start Page Tinker on this page**, or with `Alt+Shift+E`; `Esc` or the toolbar's Done to exit.
 
 ## Install (development)
 
@@ -19,15 +22,17 @@ A Firefox extension that lets you click any element on a page to edit its text, 
 2. Click **Load Temporary Add-on…**.
 3. Select [manifest.json](manifest.json).
 
+Start a session on a page by clicking the **Page Tinker toolbar button** (in the browser's extensions area), right-clicking the page → **Start Page Tinker on this page**, or pressing `Alt+Shift+E`. The floating toolbar then controls it.
+
 Chrome/Edge: open `chrome://extensions`, enable Developer mode, and **Load unpacked** on this folder. The single manifest declares both `background.scripts` (Firefox) and `service_worker` (Chrome). Chrome ignores SVG icons, so generate PNGs before a Chrome Web Store submission.
 
 ## Files
 
 - [manifest.json](manifest.json) - MV3 manifest (Firefox + Chrome compatible)
-- [background.js](background.js) - injects the editor on toolbar click / shortcut
-- [content.js](content.js) - in-page editor: edit, hide, delete, undo/redo
-- [content.css](content.css) - toolbar and overlay styles
-- [icon.svg](icon.svg) - toolbar icon
+- [background.js](background.js) - creates the right-click menu item; injects the editor on the menu click / shortcut
+- [content.js](content.js) - in-page editor + floating toolbar: edit, hide, delete, undo/redo
+- [content.css](content.css) - toolbar, hover overlay, and edit outline styles
+- [icon.svg](icon.svg) - toolbar / add-on icon
 - [CHANGELOG.md](CHANGELOG.md) - version history
 - [LICENSE](LICENSE) - MIT
 - [PRIVACY.md](PRIVACY.md) - privacy disclosure

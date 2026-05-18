@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Page Tinker",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Click any element to edit its text, hide it, or delete it - no DevTools needed. Undo/redo supported. Changes reset on reload.",
   "author": "HalfToast",
   "homepage_url": "https://github.com/HalfToast/page-tinker",
@@ -14,7 +14,7 @@
       }
     }
   },
-  "permissions": ["activeTab", "scripting"],
+  "permissions": ["activeTab", "scripting", "contextMenus"],
   "background": {
     "scripts": ["background.js"],
     "service_worker": "background.js"
